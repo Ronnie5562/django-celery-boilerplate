@@ -1,0 +1,23 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask for Help or Guidance
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=help
+    about: Need support or have a question? Reach out to the community and maintainers here.
+  - name: Share an Idea or Suggestion
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=ideas
+    about: Got a feature idea or boilerplate suggestion? Let's discuss your thoughts!
+  - name: Show & Tell - Share Your Work
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=show-and-tell
+    about: Built something cool with this boilerplate? Showcase your implementation here!
+  - name: Announcements & Updates
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=announcements
+    about: Stay up to date with the latest news and releases about this boilerplate.
+  - name: Propose a New Feature
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=suggest
+    about: Have an idea for a new feature? Submit your proposal for consideration.
+  - name: Report a Bug or Issue
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=bug
+    about: Found a problem? Please provide details so we can troubleshoot and fix it.
+  - name: General Discussion
+    url: https://github.com/ronnie5562/django-celery-boilerplate/discussions/new?category=general
+    about: For everything else—join the conversation or start a general discussion here.
