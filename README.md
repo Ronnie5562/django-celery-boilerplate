@@ -2,6 +2,8 @@
 
 A production-ready Django application boilerplate with Celery for asynchronous task processing, containerized with Docker for easy development and deployment.
 
+![Image](https://github.com/user-attachments/assets/95c3bd7f-d1fe-4b98-9bfa-05ded12c76bb)
+
 ## 🚀 Features
 
 - **Django**: Web framework for rapid development
