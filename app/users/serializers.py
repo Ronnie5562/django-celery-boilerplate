@@ -7,7 +7,6 @@ from rest_framework_simplejwt.serializers import (
 )
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.exceptions import InvalidToken
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 User = get_user_model()
@@ -41,7 +40,9 @@ class UserSerializer(serializers.ModelSerializer):
         """
         Create a user with encrypted password and returns the user instance
         """
-        return get_user_model().objects.create_user(**validated_data, is_active=False)
+        return get_user_model().objects.create_user(
+            **validated_data, is_active=False
+        )
 
     def update(self, instance, validated_data):
         """
@@ -84,14 +85,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not user_.is_active:
             raise ValidationError(
                 {
-                    "email": "Your account is not activated. You need to verify your email.",
+                    "email": "Account not yet activated. Verify your email.",
                     "code": "account_not_activated",
                 },
             )
 
         if not user_.check_password(attrs["password"]):
             raise ValidationError(
-                {"password": "Incorrect password.", "code": "incorrect_password"}
+                {
+                    "password": "Incorrect password.",
+                    "code": "incorrect_password"
+                }
             )
 
         # Validate email and password

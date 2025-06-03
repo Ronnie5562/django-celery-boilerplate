@@ -8,7 +8,6 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from users.tokens import generate_token
 from datetime import timedelta
-from django.core.exceptions import ValidationError
 
 
 User = get_user_model()
@@ -47,7 +46,9 @@ class ListCreateUserViewTests(APITestCase):
             response = self.client.post(self.url, data, format="json")
 
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            self.assertTrue(User.objects.filter(email="newuser@test.com").exists())
+            self.assertTrue(
+                User.objects.filter(email="newuser@test.com").exists()
+            )
 
             # Verify emails were sent
             mock_welcome.assert_called_once()
@@ -55,7 +56,9 @@ class ListCreateUserViewTests(APITestCase):
 
     def test_create_user_duplicate_email(self):
         """Test user creation with duplicate email"""
-        data = {"email": "user@test.com", "password": "strongpass123"}  # Already exists
+        data = {
+            "email": "user@test.com", "password": "strongpass123"
+        }  # Already exists
 
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -105,7 +108,9 @@ class ListCreateUserViewTests(APITestCase):
 
         # User should still be created despite email failures
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(User.objects.filter(email="newuser@test.com").exists())
+        self.assertTrue(
+            User.objects.filter(email="newuser@test.com").exists()
+        )
 
 
 class DetailUserViewTests(APITestCase):
@@ -128,7 +133,8 @@ class DetailUserViewTests(APITestCase):
     def test_get_nonexistent_user(self):
         """Test retrieval of non-existent user"""
         url = reverse(
-            "users:user_details", kwargs={"id": "12345678-1234-1234-1234-123456789abc"}
+            "users:user_details",
+            kwargs={"id": "12345678-1234-1234-1234-123456789abc"}
         )
         response = self.client.get(url)
 
@@ -256,7 +262,8 @@ class ActivateAccountAPIViewTests(APITestCase):
         self.user.save()
 
         url = reverse(
-            "users:activate_account", kwargs={"uidb64": self.uid, "token": self.token}
+            "users:activate_account",
+            kwargs={"uidb64": self.uid, "token": self.token}
         )
 
         response = self.client.get(url)
@@ -432,7 +439,7 @@ class SecurityTests(APITestCase):
         )
 
         if response.status_code == 201:
-            # If user was created, check that the malicious content was sanitized
+            # If user was created, confirm the malicious content was sanitized
             user = User.objects.get(email="test@test.com")
             self.assertNotIn("<script>", user.first_name)
             self.assertNotIn("onerror", user.last_name)
@@ -446,7 +453,9 @@ class SecurityTests(APITestCase):
         # Make multiple requests (would be rate limited in production)
         for _ in range(5):
             response = self.client.post(url, data, format="json")
-            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertEqual(
+                response.status_code, status.HTTP_400_BAD_REQUEST
+            )
 
     def test_sensitive_data_not_logged(self):
         """Test that sensitive data is not accidentally logged"""
@@ -457,7 +466,7 @@ class SecurityTests(APITestCase):
             with patch("users.views.email_service.send_welcome_email"), patch(
                 "users.views.email_service.send_account_verification_email"
             ):
-                response = self.client.post(
+                self.client.post(
                     reverse("users:users_list_create"), data, format="json"
                 )
 
@@ -490,7 +499,9 @@ class IntegrationTests(APITestCase):
             "users.views.email_service.send_account_verification_email"
         ) as mock_verify:
             response = self.client.post(
-                reverse("users:users_list_create"), registration_data, format="json"
+                reverse("users:users_list_create"),
+                registration_data,
+                format="json"
             )
 
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -519,10 +530,13 @@ class IntegrationTests(APITestCase):
         self.assertTrue(user.is_active)
 
         # Step 3: Login
-        login_data = {"email": "newuser@test.com", "password": "strongpass123"}
+        login_data = {
+            "email": "newuser@test.com", "password": "strongpass123"
+        }
 
         response = self.client.post(
-            reverse("users:token_obtain_pair"), login_data, format="json"
+            reverse("users:token_obtain_pair"),
+            login_data, format="json"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

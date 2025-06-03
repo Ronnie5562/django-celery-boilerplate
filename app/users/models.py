@@ -45,8 +45,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     Custom user model.
     """
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(max_length=255, unique=True, validators=[validate_email])
+    id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
+    email = models.EmailField(
+        max_length=255, unique=True, validators=[validate_email]
+    )
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
 

@@ -10,7 +10,7 @@ class IsAdminOrCreateOnly(BasePermission):
 
 class IsOwnerOrAdmin(BasePermission):
     message = (
-        "You must be the owner of this instance or an admin to perform this action."
+        "You must be the owner of this instance or an admin to perform this action."  # noqa
     )
 
     def has_object_permission(self, request, view, obj):
@@ -19,7 +19,7 @@ class IsOwnerOrAdmin(BasePermission):
 
 class IsOwnerOrAdminOrReadOnly(BasePermission):
     message = (
-        "You must be the owner of this instance or an admin to modify this content. "
+        "You must be the owner of this instance or an admin to modify this content. "  # noqa
         "Read-only access is allowed for everyone."
     )
 
@@ -30,7 +30,7 @@ class IsOwnerOrAdminOrReadOnly(BasePermission):
 
 
 class IsAdminOrReadOnly(BasePermission):
-    message = "You must be an admin to modify this content. Read-only access is allowed for everyone."
+    message = "You must be an admin to modify this content. Read-only access is allowed for everyone."  # noqa
 
     def has_permission(self, request, view):
-        return request.method in ["GET", "HEAD", "OPTIONS"] or request.user.is_staff
+        return request.method in ["GET", "HEAD", "OPTIONS"] or request.user.is_staff  # noqa

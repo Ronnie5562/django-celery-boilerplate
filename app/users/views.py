@@ -109,35 +109,58 @@ class LogOutAPIView(APIView):
 
 class JWTSetCookieMixin:
     def finalize_response(self, request, response, *args, **kwargs):
-        response = super().finalize_response(request, response, *args, **kwargs)
+        response = super().finalize_response(
+            request, response, *args, **kwargs
+        )
 
         if isinstance(response, Response):
-            refresh_token = response.data.get("refresh")
+            refresh_token = response.data.get("refresh")  # noqa
             # if refresh_token:
             #     response.set_cookie(
-            #         settings.SIMPLE_JWT.get("REFRESH_TOKEN_NAME", "refresh"),
+            #         settings.SIMPLE_JWT.get(
+            #             "REFRESH_TOKEN_NAME", "refresh"
+            #         ),
             #         refresh_token,
-            #         max_age=int(settings.SIMPLE_JWT.get(
-            #             "REFRESH_TOKEN_LIFETIME", timedelta(days=1)).total_seconds()),
+            #         max_age=int(
+            #             settings.SIMPLE_JWT.get(
+            #                 "REFRESH_TOKEN_LIFETIME",
+            #                 timedelta(days=1)
+            #             ).total_seconds()
+            #         ),
             #         httponly=True,
             #         samesite=settings.SIMPLE_JWT.get(
-            #             "AUTH_COOKIE_SAMESITE", 'Lax'),
-            #         # domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN", None),
-            #         secure=settings.SIMPLE_JWT.get("AUTH_COOKIE_SECURE", True),
+            #             "AUTH_COOKIE_SAMESITE", 'Lax'
+            #         ),
+            #         domain=settings.SIMPLE_JWT.get(
+            #             "AUTH_COOKIE_DOMAIN", None
+            #         ),
+            #         secure=settings.SIMPLE_JWT.get(
+            #             "AUTH_COOKIE_SECURE", True
+            #         ),
             #     )
 
-            access_token = response.data.get("access")
+            access_token = response.data.get("access")  # noqa
             # if access_token:
             #     response.set_cookie(
-            #         settings.SIMPLE_JWT.get("ACCESS_TOKEN_NAME", "access"),
+            #         settings.SIMPLE_JWT.get(
+            #             "ACCESS_TOKEN_NAME", "access"
+            #         ),
             #         access_token,
-            #         max_age=int(settings.SIMPLE_JWT.get(
-            #             "ACCESS_TOKEN_LIFETIME", timedelta(minutes=5)).total_seconds()),
+            #         max_age=int(
+            #             settings.SIMPLE_JWT.get(
+            #                 "ACCESS_TOKEN_LIFETIME",
+            #                 timedelta(minutes=5)
+            #             ).total_seconds()
+            #         ),
             #         httponly=True,
             #         samesite=settings.SIMPLE_JWT.get(
             #             "AUTH_COOKIE_SAMESITE", 'Lax'),
-            #         # domain=settings.SIMPLE_JWT.get("AUTH_COOKIE_DOMAIN", None),
-            #         secure=settings.SIMPLE_JWT.get("AUTH_COOKIE_SECURE", True),
+            #         domain=settings.SIMPLE_JWT.get(
+            #             "AUTH_COOKIE_DOMAIN", None
+            #         ),
+            #         secure=settings.SIMPLE_JWT.get(
+            #             "AUTH_COOKIE_SECURE", True
+            #         ),
             #     )
             # del response.data["access"]
 

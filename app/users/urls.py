@@ -19,7 +19,8 @@ urlpatterns = [
         name="activate_account",
     ),
     path(
-        "token/", views.JWTCookieTokenObtainPairView.as_view(), name="token_obtain_pair"
+        "token/", views.JWTCookieTokenObtainPairView.as_view(),
+        name="token_obtain_pair"
     ),
     path(
         "token/refresh/",

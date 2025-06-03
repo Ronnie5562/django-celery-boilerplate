@@ -29,13 +29,12 @@ def generate_email_message(user):
         name = user.email.split("@")[0]
 
     return f"""
-Hi {name},
+Hi {name}, 
 
 Welcome to our Platform! Your account is set up, and you're almost all setup. Please verify your email to gain access to the platform.
 
 For any assistance, feel free to reach out. We're here to support you.
 
-Best,
 The Platform Team
 """
 
