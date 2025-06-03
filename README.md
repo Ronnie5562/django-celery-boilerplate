@@ -92,9 +92,9 @@ docker-compose -f docker/docker-compose.yml logs -f
 
 ### 4. Access the Application
 
-- **Django App:** <`http://localhost:8000`>
-- **Flower (Celery Monitor):** <`http://localhost:5555`>
-- **Health Check:** <`http://localhost:8000/health/`>
+- **Django App:** `http://localhost:8000`
+- **Flower (Celery Monitor):** `http://localhost:5555`
+- **Health Check:** `http://localhost:8000/health/`
 
 ### 📁 Project Structure
 ```
@@ -153,12 +153,12 @@ docker-compose -f docker/docker-compose.yml logs -f celery
 ### 📊 Monitoring
 
 #### Health Checks
-- **Django:** <`http://localhost:8000/health/`>
+- **Django:** `http://localhost:8000/health/`
 - **Redis:** Built-in Redis ping
 - **PostgreSQL:** Connection test every 5 seconds
 
 #### Flower Dashboard
-Access <`http://localhost:5555`> to monitor:
+Access `http://localhost:5555` to monitor:
 
 - Active tasks
 - Task history
