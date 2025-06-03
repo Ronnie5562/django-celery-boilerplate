@@ -1,0 +1,16 @@
+# Standard settings for a web project
+* text=auto
+
+# Explicitly declare binary files (Git won't modify these)
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary
+
+# Force specific line endings for certain file types
+*.sh eol=lf
+*.bat eol=crlf
+
+# Properly handle linguist attributes for GitHub
+*.md linguist-detectable=true
+*.js linguist-detectable=true
