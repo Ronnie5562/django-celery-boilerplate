@@ -4,3 +4,4 @@ exclude =
     __pycache__,
     manage.py,
     settings.py
+chore: modified flake8 config    email_services.py,
