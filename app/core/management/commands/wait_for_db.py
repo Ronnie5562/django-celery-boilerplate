@@ -8,12 +8,11 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    """Command class to wait for db
-    """
+    """Command class to wait for db"""
 
     def handle(self, *args, **options):
         """Handle the command"""
-        self.stdout.write('Waiting for database...')
+        self.stdout.write("Waiting for database...")
         # print('Waiting for database...')
         db_up = False
 
@@ -22,7 +21,11 @@ class Command(BaseCommand):
                 self.check(databases=["default"])
                 db_up = True
             except (Psycopg2OperationalError, OperationalError):
-                self.stdout.write(self.style.WARNING('\
-                    Database unavailable, waiting 1 second...'))
+                self.stdout.write(
+                    self.style.WARNING(
+                        "\
+                    Database unavailable, waiting 1 second..."
+                    )
+                )
                 time.sleep(1)
-        self.stdout.write(self.style.SUCCESS('Database available!'))
+        self.stdout.write(self.style.SUCCESS("Database available!"))

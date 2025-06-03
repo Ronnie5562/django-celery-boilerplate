@@ -49,11 +49,11 @@ jobs:
 
     - name: Run migrations
       run: |
-        python manage.py migrate --noinput
+        python app/manage.py migrate --noinput
 
     - name: Run tests
       run: |
-        python manage.py test --parallel --noinput
+        python app/manage.py test --parallel --noinput
 
     - name: Lint with flake8
       run: |

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer,
-    TokenRefreshSerializer
+    TokenRefreshSerializer,
 )
 from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -21,34 +21,33 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         exclude = (
-            'groups',
-            'is_staff',
-            'is_active',
-            'last_login',
-            'is_superuser',
-            'date_modified',
-            'user_permissions',
+            "groups",
+            "is_staff",
+            "is_active",
+            "last_login",
+            "is_superuser",
+            "date_modified",
+            "user_permissions",
         )
         required_fields = [
-            'email', 'password',
+            "email",
+            "password",
         ]
         extra_kwargs = {
-            'password': {'write_only': True, 'min_length': 5},
+            "password": {"write_only": True, "min_length": 5},
         }
 
     def create(self, validated_data):
         """
         Create a user with encrypted password and returns the user instance
         """
-        return get_user_model().objects.create_user(
-            **validated_data, is_active=False
-        )
+        return get_user_model().objects.create_user(**validated_data, is_active=False)
 
     def update(self, instance, validated_data):
         """
         Update a user, setting the password correctly and return it
         """
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         user = super().update(instance, validated_data)
 
         if password:
@@ -78,7 +77,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise ValidationError(
                 {
                     "email": "User with this email does not exist.",
-                    "code": "user_not_found"
+                    "code": "user_not_found",
                 }
             )
 
@@ -86,16 +85,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise ValidationError(
                 {
                     "email": "Your account is not activated. You need to verify your email.",
-                    "code": "account_not_activated"
+                    "code": "account_not_activated",
                 },
             )
 
         if not user_.check_password(attrs["password"]):
             raise ValidationError(
-                {
-                    "password": "Incorrect password.",
-                    "code": "incorrect_password"
-                }
+                {"password": "Incorrect password.", "code": "incorrect_password"}
             )
 
         # Validate email and password
@@ -122,9 +118,7 @@ class JWTCookieTokenRefreshSerializer(TokenRefreshSerializer):
     refresh = None
 
     def validate(self, attrs):
-        attrs["refresh"] = attrs.get(
-            settings.SIMPLE_JWT["REFRESH_TOKEN_NAME"]
-        )
+        attrs["refresh"] = attrs.get(settings.SIMPLE_JWT["REFRESH_TOKEN_NAME"])
 
         if attrs["refresh"]:
             return super().validate(attrs)

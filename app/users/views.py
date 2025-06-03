@@ -5,7 +5,7 @@ from users.serializers import (
     CustomTokenObtainPairSerializer,
     JWTCookieTokenRefreshSerializer,
     AccountActivationSerializer,
-    LogOutSerializer
+    LogOutSerializer,
 )
 from django.shortcuts import redirect
 from rest_framework.views import APIView
@@ -31,6 +31,7 @@ class ListCreateUserView(generics.ListCreateAPIView):
     """View to create/list users
     Images Base url:
     """
+
     serializer_class = UserSerializer
     queryset = get_user_model().objects.all()
     authentication_classes = []
@@ -53,6 +54,7 @@ class ListCreateUserView(generics.ListCreateAPIView):
 
 class DetailUserView(generics.RetrieveAPIView):
     """APIView to retrieve a user"""
+
     serializer_class = UserSerializer
     queryset = get_user_model().objects.all()
     lookup_field = "id"
@@ -60,6 +62,7 @@ class DetailUserView(generics.RetrieveAPIView):
 
 class ManageProfileView(generics.RetrieveUpdateDestroyAPIView):
     """APIView to manage the authenticated user profile"""
+
     serializer_class = UserSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
@@ -84,11 +87,11 @@ class ActivateAccountAPIView(APIView):
             myuser.is_active = True
             myuser.save()
             # Change to frontend signin url
-            return redirect('http://localhost:5173/login/')
+            return redirect("http://localhost:5173/login/")
         else:
             # Change to a frontend page that says activation link is invalid
             # And provide a link to resend the activation link to their email
-            return redirect('http://localhost:5173?activation=invalid')
+            return redirect("http://localhost:5173?activation=invalid")
 
 
 class LogOutAPIView(APIView):

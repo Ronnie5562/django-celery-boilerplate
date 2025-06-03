@@ -26,7 +26,7 @@ def generate_email_message(user):
         name = user.last_name
     else:
         # Extract the part before the "@" in the email
-        name = user.email.split('@')[0]
+        name = user.email.split("@")[0]
 
     return f"""
 Hi {name},
@@ -45,22 +45,22 @@ class EmailService:
         subject = "Welcome Email"
         message = generate_email_message(user)
         welcome_email = EmailMessage(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            [user.email]
+            subject, message, settings.EMAIL_HOST_USER, [user.email]
         )
         EmailThread(welcome_email).start()
 
     def send_account_verification_email(self, request, user):
         current_site = get_current_site(request)
         email_confirmation_subject = "Verify Your Email"
-        email_confirmation_message = render_to_string('mail/email_confirmation.html', {
-            'name': user.email.split('@')[0],
-            'domain': current_site.domain,
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            'token': generate_token.make_token(user)
-        })
+        email_confirmation_message = render_to_string(
+            "mail/email_confirmation.html",
+            {
+                "name": user.email.split("@")[0],
+                "domain": current_site.domain,
+                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "token": generate_token.make_token(user),
+            },
+        )
 
         email = EmailMessage(
             email_confirmation_subject,

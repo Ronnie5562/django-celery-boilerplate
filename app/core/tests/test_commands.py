@@ -30,10 +30,10 @@ class CommandTestCases(SimpleTestCase):
             Psycopg2OperationalError,
             OperationalError,
             OperationalError,
-            True
+            True,
         ]
 
-        call_command('wait_for_db')
+        call_command("wait_for_db")
 
         self.assertEqual(patched_check.call_count, 5)
-        patched_check.assert_called_with(databases=['default'])
+        patched_check.assert_called_with(databases=["default"])

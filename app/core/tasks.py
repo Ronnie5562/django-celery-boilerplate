@@ -26,7 +26,7 @@ def add(x, y):
 
 
 # High priority task (explicit queue)
-@shared_task(queue='high_priority')
+@shared_task(queue="high_priority")
 def process_urgent_data(data):
     """High priority task example"""
     logger.warning(f"Processing urgent data: {data}")
@@ -45,20 +45,14 @@ def long_running_task(self, items):
     results = []
     for i, item in enumerate(items, 1):
         # Update progress state
-        self.update_state(
-            state='PROGRESS',
-            meta={'current': i, 'total': total}
-        )
+        self.update_state(state="PROGRESS", meta={"current": i, "total": total})
         results.append(process_item(item))
-    return {'result': results, 'total_processed': total}
+    return {"result": results, "total_processed": total}
 
 
 # Error handling task with retries
 @shared_task(
-    autoretry_for=(Exception,),
-    retry_backoff=True,
-    max_retries=3,
-    retry_jitter=True
+    autoretry_for=(Exception,), retry_backoff=True, max_retries=3, retry_jitter=True
 )
 def unreliable_task(data):
     """Task with automatic retries"""
