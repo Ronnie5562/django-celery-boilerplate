@@ -1,7 +1,10 @@
 name: App CD Pipeline
 
 on:
-  push:
+  workflow_run:
+    workflows: ["App CI Pipeline"]
+    types:
+      - completed
     branches: [ main ]
 
 env:
@@ -10,7 +13,7 @@ env:
 jobs:
   deploy:
     runs-on: self-hosted
-    needs: test_and_lint
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     - uses: actions/checkout@v4
