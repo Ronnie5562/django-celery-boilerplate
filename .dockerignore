@@ -1,0 +1,12 @@
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+.pytest_cache
+.coverage
+.nyc_output
+node_modules
+npm-debug.log
+Dockerfile*
+docker-compose*
