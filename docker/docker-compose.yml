@@ -1,5 +1,3 @@
-# version: "3.9"
-
 services:
   app:
     env_file: ../.env
@@ -14,11 +12,12 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app
+      - ../app:/app
       - static-data:/vol/web
     command: >
       sh -c "python manage.py wait_for_db &&
              python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
              gunicorn --bind 0.0.0.0:8000 --workers 4 --threads 2 app.wsgi:application"
     environment:
       - DEBUG=False
@@ -33,14 +32,17 @@ services:
     networks:
       - app_network
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
   celery:
     image: app:latest
@@ -48,38 +50,54 @@ services:
     hostname: celery
     command: celery -A app worker -l INFO --concurrency=4
     volumes:
-      - .:/usr/src/app
+      - ../app:/app
     environment:
-      - DEBUG=0
-      - DJANGO_ALLOWED_HOSTS=appdomain.com
-      - CELERY_BROKER=redis://redis:6379/0
-      - CELERY_BACKEND=redis://redis:6379/0
+      - DEBUG=False
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
     networks:
       - app_network
     depends_on:
-      - app
-      - redis
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
   celery-beat:
     image: app:latest
     container_name: celery-beat
     hostname: celery-beat
-    command: celery -A app beat -l INFO
+    command: celery -A app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
     volumes:
-      - .:/usr/src/app
+      - ../app:/app
     environment:
-      - DEBUG=0
-      - CELERY_BROKER=redis://redis:6379/0
+      - DEBUG=False
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
     networks:
       - app_network
     depends_on:
-      - app
-      - redis
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
+    image: redis:7
     container_name: redis
     hostname: redis
     ports:
@@ -97,25 +115,39 @@ services:
     command: redis-server --save 60 1 --loglevel warning
 
   flower:
-    image: mher/flower:latest
+    image: app:latest
     container_name: flower
     hostname: flower
-    command: celery -A app flower --port=5555
+    command: celery -A app flower --port=5555 --broker=redis://redis:6379/0 --basic_auth=admin:admin --persistent=true
     ports:
       - "5555:5555"
+    volumes:
+      - ../app:/app
+    environment:
+      - DEBUG=False
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL:-redis://redis:6379/0}
+      - CELERY_BACKEND_URL=${CELERY_BACKEND_URL:-redis://redis:6379/0}
     networks:
       - app_network
     depends_on:
-      - redis
-      - celery
+      redis:
+        condition: service_healthy
+      celery:
+        condition: service_started
+    restart: unless-stopped
 
   db:
-    image: postgres:15-alpine
+    image: postgres:15
     container_name: db
     hostname: db
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./postgresql.conf:/etc/postgresql/postgresql.conf
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
