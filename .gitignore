@@ -125,3 +125,6 @@ dmypy.json
 
 # static files
 staticfiles/
+
+# flower
+flower
