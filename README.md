@@ -158,12 +158,15 @@ docker-compose -f docker/docker-compose.yml logs -f celery
 - **PostgreSQL:** Connection test every 5 seconds
 
 #### Flower Dashboard
-Access `http://localhost:5555` to monitor:
+Access `http://localhost:5555` using username: `admin`, password: `admin` to monitor:
 
 - Active tasks
 - Task history
 - Worker status
 - Task statistics
+
+**NOTE:** You change the flower auth credentials in the `docker/docker-compose.dev.yml` file
+
 
 ### 🚀 Production Deployment
 
