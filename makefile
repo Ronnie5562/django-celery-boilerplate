@@ -57,6 +57,12 @@ resetdb: ## Reset database (#!DANGER: destroys data)
 	$(DJANGO_MANAGE) createsuperuser
 
 # Docker Operations
+.PHONY: docker_shell
+container_shell: ## Open a shell in the Django container
+	@echo "Opening shell in Django container..."
+	cd docker && \
+	docker-compose run app bash
+
 .PHONY: up
 up: ## Start all containers in detached mode
 	@echo "Starting containers..."
@@ -67,10 +73,21 @@ down: ## Stop and remove containers
 	@echo "Stopping containers..."
 	docker-compose -f $(DOCKER_COMPOSE_FILE) down
 
+.PHONY: refresh
+refresh: ## Refresh containers with updated environment variables
+	@echo "Refreshing containers with updated environment..."
+	docker-compose -f $(DOCKER_COMPOSE_FILE) down
+	docker-compose -f $(DOCKER_COMPOSE_FILE) --env-file $(ENV_FILE) up -d
+
+.PHONY: restart
+restart: ## Restart specific services
+	@echo "Restarting services..."
+	docker-compose -f $(DOCKER_COMPOSE_FILE) restart app redis celery celery-beat flower
+
 .PHONY: build
 build: ## Build Docker images
 	@echo "Building images..."
-	COMPOSE_BAKE=true docker-compose -f $(DOCKER_COMPOSE_FILE) build
+	COMPOSE_BAKE=true docker-compose -f $(DOCKER_COMPOSE_FILE) build --no-cache
 
 .PHONY: logs
 logs: ## View container logs
