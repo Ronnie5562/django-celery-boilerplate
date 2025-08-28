@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     # Third-party apps
     "django_countries",
     'django_celery_beat',
+    "django_celery_results",
     "corsheaders",
     "phonenumber_field",
     "rest_framework",
