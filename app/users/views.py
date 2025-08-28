@@ -201,7 +201,7 @@ class PasswordResetView(APIView):
         except User.DoesNotExist:
             return Response(
                 {
-                    "detail": "If this email exists in our system, a password reset link has been sent."
+                    "detail": "A password reset link has been sent."
                 },
                 status=status.HTTP_200_OK
             )
@@ -232,7 +232,9 @@ class PasswordResetConfirmView(APIView):
     """
     serializer_class = PasswordResetConfirmSerializer
 
-    @method_decorator(sensitive_post_parameters('new_password1', 'new_password2'))
+    @method_decorator(
+        sensitive_post_parameters('new_password1', 'new_password2')
+    )
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
@@ -246,10 +248,14 @@ class PasswordResetConfirmView(APIView):
         try:
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = get_user_model()._default_manager.get(pk=uid)
-        except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
+        except (
+            TypeError, ValueError, OverflowError, get_user_model().DoesNotExist
+        ):
             user = None
 
-        if user is None or not default_token_generator.check_token(user, token):
+        if user is None or not default_token_generator.check_token(
+            user, token
+        ):
             return Response(
                 {"detail": "Invalid password reset link"},
                 status=status.HTTP_400_BAD_REQUEST
