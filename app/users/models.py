@@ -78,5 +78,13 @@ class User(AbstractBaseUser, PermissionsMixin):
             return f"{self.first_name} {self.last_name} ({self.email})"
         return self.email
 
+    def get_full_name(self):
+        """Return the user's full name"""
+        return f"{self.first_name} {self.last_name}".strip()
+
+    def get_short_name(self):
+        """Return the user's short name"""
+        return self.first_name or self.last_name or self.email.split('@')[0]
+
     class Meta:
         ordering = ("-date_joined",)
