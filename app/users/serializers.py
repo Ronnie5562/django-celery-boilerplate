@@ -136,3 +136,12 @@ class AccountActivationSerializer(serializers.Serializer):
 
 class LogOutSerializer(serializers.Serializer):
     pass
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password1 = serializers.CharField(write_only=True)
+    new_password2 = serializers.CharField(write_only=True)
