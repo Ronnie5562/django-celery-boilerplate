@@ -45,6 +45,7 @@ services:
       start_period: 40s
 
   celery:
+    env_file: ../.env
     image: app:latest
     container_name: celery
     hostname: celery
@@ -71,6 +72,7 @@ services:
     restart: unless-stopped
 
   celery-beat:
+    env_file: ../.env
     image: app:latest
     container_name: celery-beat
     hostname: celery-beat
@@ -115,6 +117,7 @@ services:
     command: redis-server --save 60 1 --loglevel warning
 
   flower:
+    env_file: ../.env
     image: app:latest
     container_name: flower
     hostname: flower
@@ -143,6 +146,7 @@ services:
     restart: unless-stopped
 
   db:
+    env_file: ../.env
     image: postgres:15
     container_name: db
     hostname: db
