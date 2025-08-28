@@ -6,6 +6,8 @@ from users.serializers import (
     JWTCookieTokenRefreshSerializer,
     AccountActivationSerializer,
     LogOutSerializer,
+    PasswordResetSerializer,
+    PasswordResetConfirmSerializer,
 )
 from django.shortcuts import redirect
 from rest_framework.views import APIView
@@ -15,11 +17,15 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .throttle import PasswordResetThrottle
 from users.email_services import EmailService
 from django.contrib.auth import get_user_model
-from rest_framework import generics, permissions
 from utils.permissions import IsAdminOrCreateOnly
 from django.utils.http import urlsafe_base64_decode
+from django.utils.decorators import method_decorator
+from rest_framework import generics, permissions, status
+from django.contrib.auth.tokens import default_token_generator
+from django.views.decorators.debug import sensitive_post_parameters
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 
@@ -47,7 +53,10 @@ class ListCreateUserView(generics.ListCreateAPIView):
             logger.error(f"Failed to send welcome email: {str(e)}")
 
         try:
-            email_service.send_account_verification_email(user)
+            email_service.send_account_verification_email(
+                self.request,
+                user
+            )
         except Exception as e:
             logger.error(f"Failed to send verification email: {str(e)}")
 
@@ -173,3 +182,84 @@ class JWTCookieTokenObtainPairView(JWTSetCookieMixin, TokenObtainPairView):
 
 class JWTCookieTokenRefreshView(JWTSetCookieMixin, TokenRefreshView):
     serializer_class = JWTCookieTokenRefreshSerializer
+
+
+class PasswordResetView(APIView):
+    serializer_class = PasswordResetSerializer
+    throttle_classes = [PasswordResetThrottle]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        # print(serializer)
+        serializer.is_valid(raise_exception=True)
+
+        # Get user by email
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=serializer.validated_data['email'])
+        except User.DoesNotExist:
+            return Response(
+                {
+                    "detail": "If this email exists in our system, a password reset link has been sent."
+                },
+                status=status.HTTP_200_OK
+            )
+
+        # Send password reset email
+        email_service = EmailService()
+        email_service.send_password_reset_link(request, user)
+
+        return Response(
+            {
+                "detail": "Password reset e-mail has been sent."
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    """
+    Password reset confirmation endpoint.
+
+    Validates the reset token and sets the new password.
+
+    Parameters:
+    - uid: Base64 encoded user ID3
+    - token: Password reset token
+    - new_password1: New password
+    - new_password2: New password confirmation
+    """
+    serializer_class = PasswordResetConfirmSerializer
+
+    @method_decorator(sensitive_post_parameters('new_password1', 'new_password2'))
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        uidb64 = kwargs.get('uidb64')
+        token = kwargs.get('token')
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = get_user_model()._default_manager.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, get_user_model().DoesNotExist):
+            user = None
+
+        if user is None or not default_token_generator.check_token(user, token):
+            return Response(
+                {"detail": "Invalid password reset link"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        new_password = serializer.validated_data['new_password1']
+        user.set_password(new_password)
+        user.save()
+
+        return Response(
+            {"detail": "Password has been reset successfully."},
+            status=status.HTTP_200_OK
+        )
