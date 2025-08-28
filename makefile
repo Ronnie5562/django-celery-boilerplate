@@ -1,6 +1,7 @@
 # Environment variables (can be overridden)
 ENV_FILE ?= .env
 DOCKER_COMPOSE_FILE ?= docker/docker-compose.yml
+DOCKER_COMPOSE_DEV_FILE ?= docker/docker-compose.dev.yml
 PROJECT_NAME ?= app
 DJANGO_MANAGE := python3 app/manage.py
 
@@ -63,6 +64,11 @@ container_shell: ## Open a shell in the Django container
 	cd docker && \
 	docker-compose run app bash
 
+.PHONY: dev
+dev: ## Start all containers in dev mode
+	@echo "Starting containers in dev mode..."
+	docker-compose -f $(DOCKER_COMPOSE_FILE) -f $(DOCKER_COMPOSE_DEV_FILE) --env-file $(ENV_FILE) up
+
 .PHONY: up
 up: ## Start all containers in detached mode
 	@echo "Starting containers..."
@@ -82,12 +88,12 @@ refresh: ## Refresh containers with updated environment variables
 .PHONY: restart
 restart: ## Restart specific services
 	@echo "Restarting services..."
-	docker-compose -f $(DOCKER_COMPOSE_FILE) restart app redis celery celery-beat flower
+	docker-compose -f $(DOCKER_COMPOSE_FILE) --env-file $(ENV_FILE) restart app redis celery celery-beat flower
 
 .PHONY: build
 build: ## Build Docker images
 	@echo "Building images..."
-	COMPOSE_BAKE=true docker-compose -f $(DOCKER_COMPOSE_FILE) build --no-cache
+	COMPOSE_BAKE=true docker-compose -f docker/docker-compose.yml --env-file $(ENV_FILE) build --no-cache
 
 .PHONY: logs
 logs: ## View container logs
@@ -112,7 +118,7 @@ collectstatic: ## Collect static files
 .PHONY: superuser
 superuser: ## Create superuser
 	@echo "Creating superuser..."
-	$(DJANGO_MANAGE) createsuperuser
+	docker-compose -f $(DOCKER_COMPOSE_FILE) --env-file $(ENV_FILE) exec app python3 manage.py createsuperuser
 
 .PHONY: prod
 prod: build up ## Build and start production environment
