@@ -3,7 +3,9 @@ from django.core.mail import EmailMessage
 
 
 @shared_task(bind=True, max_retries=3)
-def send_email_task(self, subject, body, from_email, recipient_list, content_subtype="plain"):
+def send_email_task(
+    self, subject, body, from_email, recipient_list, content_subtype="plain"
+):
     try:
         email = EmailMessage(
             subject=subject,
